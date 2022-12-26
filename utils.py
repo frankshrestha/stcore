@@ -12,7 +12,7 @@ def _get_cnx_params(endpoint=None, database=None):
             f"Provide database name or set {endpoint}_DATABASE in the environment.")
 
     host = getenv(f'{endpoint}_HOST', 'localhost')
-    port = getenv(f'{endpoint}_PORT', 3306)
+    port = int(getenv(f'{endpoint}_PORT', 3306))
     user = getenv(f'{endpoint}_USERNAME', 'root')
     password = getenv(f'{endpoint}_PASSWORD', '')
 
