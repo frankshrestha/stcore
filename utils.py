@@ -6,14 +6,14 @@ def _get_cnx_params(endpoint=None, database=None):
 
     database = '' if on_cloud else database
 
-    database = getenv(f'{endpoint}_DATABASE', database)
+    database = getenv('DATABASE', database)
     if not database:
         raise ValueError(
-            f"Provide database name or set {endpoint}_DATABASE in the environment.")
+            'Provide database name or set DATABASE in the environment.')
 
     host = getenv(f'{endpoint}_HOST', 'localhost')
-    port = int(getenv(f'{endpoint}_PORT', 3306))
-    user = getenv(f'{endpoint}_USERNAME', 'root')
-    password = getenv(f'{endpoint}_PASSWORD', '')
+    port = int(getenv('PORT', 3306))
+    user = getenv('USERNAME', 'root')
+    password = getenv('PASSWORD', '')
 
     return user, password, host, port, database
