@@ -16,9 +16,9 @@ def _validate_secrets(secret: dict):
     }
 
 
-def _get_secrets(endpoint):
+def _get_secrets(endpoint, env_key_prefix):
 
-    secret_id = getenv('SECRET_ID', '')
+    secret_id = getenv(f'{env_key_prefix}SECRET_ID', '')
 
     if not secret_id:
         return {'status': False, 'message': 'SECRET_ID not found in environment.', 'data': {}}
@@ -39,24 +39,26 @@ def _get_secrets(endpoint):
     return _validate_secrets(secret)
 
 
-def _get_env_secrets(endpoint):
+def _get_env_secrets(endpoint, env_key_prefix):
 
     secret = {
-        'user': getenv('USERNAME', 'root'),
-        'password': getenv('PASSWORD', ''),
-        'host': getenv(f'{endpoint}_HOST', 'localhost'),
-        'port': int(getenv('PORT', 3306)),
-        'database': getenv('DATABASE', '')
+        'user': getenv(f'{env_key_prefix}USERNAME', 'root'),
+        'password': getenv(f'{env_key_prefix}PASSWORD', ''),
+        'host': getenv(f'{env_key_prefix}{endpoint}_HOST', 'localhost'),
+        'port': int(getenv(f'{env_key_prefix}PORT', 3306)),
+        'database': getenv(f'{env_key_prefix}DATABASE', '')
     }
 
     return _validate_secrets(secret)
 
 
-def _get_cnx_params(endpoint=None, database=None):
+def _get_cnx_params(endpoint=None, database='', env_key_prefix=''):
+
     on_cloud = True if ('amzn' in uname().release) else False
+    env_key_prefix = f'{env_key_prefix}_' if env_key_prefix else ''
 
     if on_cloud:
-        resp = _get_secrets(endpoint)
+        resp = _get_secrets(endpoint, env_key_prefix)
 
         if resp['status']:
             return resp['data'].values()
@@ -64,7 +66,7 @@ def _get_cnx_params(endpoint=None, database=None):
         print(
             f'{resp["message"]}\n{resp["data"]}\nFalling back to environment variables.')
 
-    resp = _get_env_secrets(endpoint)
+    resp = _get_env_secrets(endpoint, env_key_prefix)
 
     if resp['status']:
         return resp['data'].values()
